@@ -3,7 +3,7 @@ import csv
 
 destination = 'Data'
 url = 'https://www.moex.com/ru/listing/securities-list-csv.aspx?type=1'
-# urllib.request.urlretrieve(url, destination)
+urllib.request.urlretrieve(url, destination)
 
 with open("Data", encoding="windows-1251") as f:
     file_reader = csv.reader(f, delimiter=',')
