@@ -13,6 +13,7 @@ with open('pars.html', 'r', encoding='utf-8') as f:
     link = html[first:last].split("<a href=")[1]
     link = link[1:len(link)-1]
 
+
 link = "https://www.moex.com/ru/listing/" + link
 
 destination = 'Data'
