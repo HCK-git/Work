@@ -1,9 +1,22 @@
 import urllib.request
 import csv
 
+
+url = "https://www.moex.com/ru/listing/securities-list.aspx"
+
+urllib.request.urlretrieve(url, 'pars.html')
+
+with open('pars.html', 'r', encoding='utf-8') as f:
+    html = f.read()
+    first = html.find("Скачать данные в формате")
+    last = html.find(">CSV (разделители - запятые)")
+    link = html[first:last].split("<a href=")[1]
+    link = link[1:len(link)-1]
+
+link = "https://www.moex.com/ru/listing/" + link
+
 destination = 'Data'
-url = 'https://www.moex.com/ru/listing/securities-list-csv.aspx?type=1'
-urllib.request.urlretrieve(url, destination)
+urllib.request.urlretrieve(link, destination)
 
 with open("Data", encoding="windows-1251") as f:
     file_reader = csv.reader(f, delimiter=',')
