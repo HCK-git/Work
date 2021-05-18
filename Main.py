@@ -1,7 +1,6 @@
 import urllib.request
 import csv
 
-
 url = "https://www.moex.com/ru/listing/securities-list.aspx"
 
 urllib.request.urlretrieve(url, 'pars.html')
