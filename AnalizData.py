@@ -30,7 +30,7 @@ def url_callback(urls):
     listik = []
     k = 0
     for elem in urls:
-        # k += 1
+
         # print(inform_dict[elem][0])
         if "https:" not in elem and "http:" not in elem:
             elem = "https://" + elem
@@ -49,13 +49,14 @@ def url_callback(urls):
                 string_united = string_united.replace(string_united[first_amp:second_amp+1], '')
                 first = string_united.find('"')
                 second = string_united.find('">')
-                listik.append(string_united)
+                print("https://e-disclosure.ru/"+string_united[first:second+1])
+                listik.append("https://e-disclosure.ru/"+string_united[first+1:second-1])
     return listik
 
 
 if __name__ == '__main__':
     multiprocessing.freeze_support()
-    mp = multiprocessing.Pool(processes=16)
+    mp = multiprocessing.Pool(processes=8)
     urls_with_reports = mp.imap_unordered(url_callback, url_list)
     urls_cleaned = set( itertools.chain(*urls_with_reports))
     print(urls_cleaned)
