@@ -5,7 +5,8 @@ from bs4 import BeautifulSoup
 import numpy as np
 import itertools
 import multiprocessing
-
+import os
+import json
 
 df = pd.read_csv('Data', encoding='1251')
 pd.set_option('display.max_columns', None)
@@ -23,7 +24,6 @@ for elem in inform_dict.keys():
 
 
 def url_callback(urls):
-
     # pprint(inform_dict)
     listik = []
     k = 0
@@ -64,15 +64,20 @@ def url_callback(urls):
     return listik
 
 
-if __name__ == '__main__':
-    multiprocessing.freeze_support()
-    mp = multiprocessing.Pool(processes=8)
-    urls_with_reports = mp.imap_unordered(url_callback, url_list)
-    urls_cleaned = dict(itertools.chain(*urls_with_reports))
-    with open("List.txt", "w") as f:
-        for elem in urls_cleaned.keys():
-            f.write("{}\n".format(urls_cleaned[elem]))
-    print(urls_cleaned)
+def make_file(data):
+    with open("List.json", "w") as f:
+        # for elem in urls_cleaned.keys():
+        json.dump(data, f)
 
+if __name__ == '__main__':
+    if os.path.exists("List.txt"):
+        pass
+    else
+        multiprocessing.freeze_support()
+        mp = multiprocessing.Pool(processes=8)
+        urls_with_reports = mp.imap_unordered(url_callback, url_list)
+        urls_cleaned = dict(itertools.chain(*urls_with_reports))
+        make_file(urls_cleaned)
+    # print(urls_cleaned)
 
 
