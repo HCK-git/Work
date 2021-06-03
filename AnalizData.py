@@ -1,40 +1,34 @@
 import pandas as pd
-from pprint import pprint
 import requests
 from bs4 import BeautifulSoup
-import numpy as np
 import itertools
 import multiprocessing
 import os
 import json
-import urllib
-import io
 import zipfile
 import tempfile
 
-# df = pd.read_csv('Data', encoding='1251')
-# pd.set_option('display.max_columns', None)
-# df = df[['EMITENT_FULL_NAME', 'DISCLOSURE_RF_INFO_PAGE']].drop_duplicates()
-# # print(df)
-#
-# df['DISCLOSURE_RF_INFO_PAGE'].fillna(0, inplace=True)
-# inform_dict = df.groupby(['EMITENT_FULL_NAME'])['DISCLOSURE_RF_INFO_PAGE'].apply(list).to_dict()
-# pprint(inform_dict)
-# url_dict = {}
-# for elem in inform_dict.keys():
-#     if inform_dict[elem][0] != 0 and "e-disclosure" in inform_dict[elem][0]:
-#         url_dict[elem] = inform_dict[elem]
-# pprint(url_list)
+
+keys = []
+df = pd.read_csv('Data', encoding='1251')
+pd.set_option('display.max_columns', None)
+df = df[['EMITENT_FULL_NAME', 'DISCLOSURE_RF_INFO_PAGE']].drop_duplicates()
+# print(df)
+
+df['DISCLOSURE_RF_INFO_PAGE'].fillna(0, inplace=True)
+inform_dict = df.groupby(['EMITENT_FULL_NAME'])['DISCLOSURE_RF_INFO_PAGE'].apply(list).to_dict()
+url_list = []
+for elem in inform_dict.keys():
+    if inform_dict[elem][0] != 0 and "e-disclosure" in inform_dict[elem][0]:
+        url_list.append(inform_dict[elem])
 
 
-def saving():
-    # for elem in url.keys():
-    #     if "e-disclosure" in url[elem]:
-            link = 'https://e-disclosure.ru/portal/files.aspx?id=2798&type=2'
-    # url[elem]
+def saving(url):
+    for elem in url.keys():
+        if "e-disclosure" in url[elem]:
+            link = url[elem]
             response = requests.get(link)
             soup = BeautifulSoup(response.text, 'lxml')
-            # quotes = soup.find_all('a')
             quotes = soup.findAll("a", {"class": "file-link"})
             print(quotes)
             for elements in quotes:
@@ -47,39 +41,40 @@ def saving():
                 beg_url = string_united.find('href="http')+6
                 end_url = string_united.find('">')
                 print(string_united[beg_url:end_url])
-            response = requests.get('https://e-disclosure.ru/portal/FileLoad.ashx?Fileid=1356012')
-            file = tempfile.TemporaryFile()
-            file.write(response.content)
-            fzip = zipfile.ZipFile(file)
-            fzip.extractall('Data/reporting/')
-            file.close()
-            fzip.close()
+                response = requests.get(string_united[beg_url:end_url])
+                file = tempfile.TemporaryFile()
+                file.write(response.content)
+                fzip = zipfile.ZipFile(file)
+                fzip.extractall('Data/reporting/'+elem)
+                file.close()
+                fzip.close()
 
 
 def url_callback(urls):
     # pprint(inform_dict)
-    dict_otch = {}
+    global keys
+    otch_list = []
     k = 0
-    for elem in urls.keys():
-
-        print(elem)
-        # print('1')
-        if " " in urls[elem]:
-            urls[elem] = urls[elem].replace(" ", '')
-        if "https:" not in urls[elem] and "http:" not in urls[elem]:
-            urls[elem] = "https://" + urls[elem]
+    for elem in urls:
+        if " " in elem:
+            elem = elem.replace(" ", '')
+        if "https:" not in elem and "http:" not in elem:
+            elem = "https://" + elem
             # print('2')
-        url = urls[elem]
+        url = elem
+        print(url)
         response = requests.get(url)
-        print('404')
+        # print("2.1")
+        # print('404')
         soup = BeautifulSoup(response.text, 'lxml')
-        print('505')
+        # print('505')
         quotes = soup.find_all('a')
         # print('3')
         for elements in quotes:
             string_united = ''
             # print('4')
             if "Годовая" in elements:
+                keys.append(elem)
                 string = str(elements)
                 # print('5')
                 for i in string:
@@ -92,9 +87,9 @@ def url_callback(urls):
                 first = string_united.find('"')
                 second = string_united.find('">')
                 print("https://e-disclosure.ru/"+string_united[first+1:second])
-                dict_otch = "https://e-disclosure.ru/"+string_united[first+1:second]
+                otch_list.append("https://e-disclosure.ru/"+string_united[first+1:second])
                 # print('7')
-    return dict_otch
+    return otch_list
 
 
 def make_file(data):
@@ -109,16 +104,17 @@ def read_file():
     return list_info
 
 
-
-saving()
-
-# if __name__ == '__main__':
-#     if os.path.exists("List.json"):
-#         urls_cleaned = read_file()
-#     else:
-#         multiprocessing.freeze_support()
-#         mp = multiprocessing.Pool(processes=8)
-#         urls_with_reports = mp.imap_unordered(url_callback, url_dict)
-#         urls_cleaned = dict(itertools.chain(*urls_with_reports))
-#         make_file(urls_cleaned)
-#     # print(urls_cleaned)
+if __name__ == '__main__':
+    companies_dict = {}
+    if os.path.exists("List.json"):
+        urls_cleaned = read_file()
+    else:
+        multiprocessing.freeze_support()
+        mp = multiprocessing.Pool(processes=8)
+        urls_with_reports = mp.imap_unordered(url_callback, url_list)
+        urls_cleaned = list(itertools.chain(*urls_with_reports))
+        for i in range(len(urls_cleaned)):
+            companies_dict[keys[i]] = urls_cleaned[i]
+        make_file(companies_dict)
+    saving(urls_cleaned)
+    # print(urls_cleaned)
