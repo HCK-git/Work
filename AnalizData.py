@@ -74,7 +74,6 @@ def url_callback(urls):
             string_united = ''
             # print('4')
             if "Годовая" in elements:
-                keys.append(elem)
                 string = str(elements)
                 # print('5')
                 for i in string:
@@ -88,6 +87,7 @@ def url_callback(urls):
                 second = string_united.find('">')
                 print("https://e-disclosure.ru/"+string_united[first+1:second])
                 otch_list.append("https://e-disclosure.ru/"+string_united[first+1:second])
+                keys.append(elem)
                 # print('7')
     return otch_list
 
@@ -110,11 +110,14 @@ if __name__ == '__main__':
         urls_cleaned = read_file()
     else:
         multiprocessing.freeze_support()
-        mp = multiprocessing.Pool(processes=8)
-        urls_with_reports = mp.imap_unordered(url_callback, url_list)
-        urls_cleaned = list(itertools.chain(*urls_with_reports))
-        for i in range(len(urls_cleaned)):
-            companies_dict[keys[i]] = urls_cleaned[i]
+        mp = multiprocessing.Pool(processes=6)
+        urls_with_reports = list(mp.imap_unordered(url_callback, url_list))
+        # print('Length of value before: {}', format(len(urls_with_reports)))
+        # urls_cleaned = list(itertools.chain(*urls_with_reports))
+        print('Length of keys: {}', format(len(keys)))
+        print('Length of value: {}', format(len(urls_with_reports)))
+        for i in range(len(urls_with_reports)):
+            companies_dict[keys[i]] = urls_with_reports[i]
         make_file(companies_dict)
-    saving(urls_cleaned)
+    saving(companies_dict)
     # print(urls_cleaned)
