@@ -13,7 +13,7 @@ keys = []
 
 
 def forming_dict():
-    df = pd.read_csv('Data', encoding='1251')
+    df = pd.read_csv(os.path.abspath('../Data/Data'), encoding='1251')
     pd.set_option('display.max_columns', None)
     df = df[['EMITENT_FULL_NAME', 'DISCLOSURE_RF_INFO_PAGE']].drop_duplicates()
     # print(df)
@@ -191,11 +191,12 @@ def read_file():
 #         urls_cleaned = read_file()
 #         pprint.pprint(urls_cleaned)
 # else:
-pprint.pprint(url_dict)
-urls_cleaned = url_callback(url_dict)
-pprint.pprint(urls_cleaned)
-make_file(urls_cleaned)
-# # search(urls_cleaned)
+# url_dict = forming_dict()
+# pprint.pprint(url_dict)
+# urls_cleaned = url_callback(url_dict)
+# pprint.pprint(urls_cleaned)
+# make_file(urls_cleaned)
+# # # search(urls_cleaned)
 # print(len(urls_cleaned.keys()))
 # saving(urls_cleaned)
 
