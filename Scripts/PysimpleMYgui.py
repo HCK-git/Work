@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import json
-from ..AnalizData import url_callback, forming_dict, make_file
+from .. import Library
+# from ..AnalizData import url_callback, forming_dict, make_file
 import os
 
 url_dict = {}
