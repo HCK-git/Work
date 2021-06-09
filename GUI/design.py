@@ -12,7 +12,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2 import QtCore
-from .AnalizData import url_callback
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         QMetaObject.connectSlotsByName(MainWindow)
-        self.pushButton.clicked.connect(self)
+        self.pushButton.clicked.connect(self.printik)
     # setupUi
     def printik(self):
         print('privet')
