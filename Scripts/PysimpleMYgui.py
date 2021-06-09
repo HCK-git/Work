@@ -38,3 +38,14 @@ if os.path.exists('C:\python\DataAnalizing\DataAnalizing\List.json'):
             url_callback(url_dict)
             make_file(url_dict)
 else:
+    text = sg.Text('Перед началом работы необходимо скачать данные. Для этого нажмите на кнопку.')
+    button_download = [sg.Text(' ' * 45), sg.Button('Закачать данные')]                           
+    layout = [[text], [button_download]]                                                          
+    window = sg.Window('', layout)                                                                
+
+    while True:                                                                                   
+        event, values = window.read()                                                             
+        if event == sg.WIN_CLOSED or event == 'Cancel':                                           
+            break                                                                                 
+
+    window.close()                                                                                
