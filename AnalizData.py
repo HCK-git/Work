@@ -109,6 +109,13 @@ def url_callback(urls):
     otch_dict = {}
     k = 0
     for elem in urls.keys():
+        if ';' in urls[elem]:
+            print('in ;')
+            list_of_urls = urls[elem].split(';')
+            for i in list_of_urls:
+                if 'www.e-disclosure.ru/' in i:
+                    print(f'i: {i}')
+                    urls[elem] = i
         # time.sleep(0.2)
         k = k + 1
         print(f"elem: {urls[elem]}")
@@ -185,3 +192,5 @@ make_file(urls_cleaned)
 # # search(urls_cleaned)
 # print(len(urls_cleaned.keys()))
 # saving(urls_cleaned)
+
+# print(url_dict['Общество с ограниченной ответственностью "ДиректЛизинг"'])
