@@ -11,12 +11,13 @@ url_dict = {}
 path = os.getcwd()
 
 if os.path.exists(os.path.abspath('../Data/List.json')):
-    with open(os.path.abspath('../Data/List.json'), "r") as f:
-        companies_dict = json.load(f)
+    # with open(os.path.abspath('../Data/List.json'), "r") as f:
+    #     companies_dict = json.load(f)
+    url_dict = AnalizData.read_file()
 
-    companies_list = companies_dict.keys()
+    companies_list = url_dict.keys()
 
-    print(companies_list)
+    # print(companies_list)
 
 
     # col2 = sg.Column([[sg.Frame('Компании:', [[sg.Column([[sg.Listbox([str(i) for i in  companies_list],
@@ -43,8 +44,8 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
             url_dict = AnalizData.forming_dict()
             AnalizData.url_callback(url_dict)
             AnalizData.make_file(url_dict)
-        # if event == 'Скачать отчетности':
-        #     AnalizData.saving(urls_dict)
+        if event == 'Скачать отчетности':
+            AnalizData.saving(url_dict)
 
 else:
     text = sg.Text('Перед началом работы необходимо скачать данные. Для этого нажмите на кнопку.')

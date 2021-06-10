@@ -35,18 +35,18 @@ def saving(url):
     for elem in url.keys():
         name = elem
         while ('"' in name):
-            name = elem.replace('"', ' ')
+            name = elem.replace('"', '')
         name = name.lstrip()
         name = name.rstrip()
-        if os.path.exists("reporting/" + name):
+        if os.path.exists(os.path.abspath('../Output') + '/' + name):
             print("in if")
             pass
-        # print(os.path.exists("reporting/" + name))
+        # print(os.path.exists(os.path.abspath('../Output') + '/'  + name))
         else:
             print('in else')
-            os.mkdir('reporting/' + name)
+            os.mkdir(os.path.abspath('../Output') + '/' + name)
         print(f"name: {name}")
-        print("reporting/" + name)
+        print(os.path.abspath('../Output') + '/' + name)
         k = k + 1
         print('k = {}'.format(k))
         link = url[elem]
@@ -75,8 +75,8 @@ def saving(url):
                         url_to_download = url_to_download.replace(' ', '_')
                     print(url_to_download)
                     print(elem)
-                    with open('reporting/' + name + '/' + destination, 'wb') as f:
-                        destination = 'reporting/' + elem + '/' + destination
+                    with open(os.path.abspath('../Output') + '/'  + name + '/' + destination, 'wb') as f:
+                        destination = os.path.abspath('../Output') + '/'  + elem + '/' + destination
                         print('скачиваю')
                         ufr = requests.get(url_to_download)
                         print(f'urf: {ufr.content.decode("windows 1251")}')# делаем запрос
@@ -104,7 +104,7 @@ def saving(url):
                     print(f'file: {fzip}')
                     while ('"' in elem):
                         elem = elem.replace('"', ' ')
-                    fzip.extractall("reporting/" + elem)
+                    fzip.extractall(os.path.abspath('../Output') + "/" + name)
                     file.close()
                     fzip.close()
                 except zipfile.BadZipFile:
@@ -176,13 +176,13 @@ def search(urls):
         pprint.pprint(string_united[j:len(string_united)])
 
 def make_file(data):
-    with open("List.json", "w") as f:
+    with open(os.path.abspath('../Data/List.json'), "w") as f:
         # for elem in urls_cleaned.keys():
         json.dump(data, f)
 
 
 def read_file():
-    with open("List.json", "r") as f:
+    with open(os.path.abspath('../Data/List.json'), "r") as f:
         list_info = json.load(f)
     return list_info
 
