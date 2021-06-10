@@ -7,8 +7,11 @@ import sys
 sys.path.append(os.path.abspath('../Library'))
 import AnalizData
 
+
+import pprint
 url_dict = {}
 path = os.getcwd()
+
 
 if os.path.exists(os.path.abspath('../Data/List.json')):
     # with open(os.path.abspath('../Data/List.json'), "r") as f:
@@ -24,15 +27,18 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
     #                                                                   key='-ACCT-LIST-', size=(250, 437)), ]],
     #                                                      scrollable=True, size=(500, 600))]])]], pad=(0, 0))
 
-    col2 = sg.Frame('Компании', [[sg.Listbox(companies_list, size=(150, 35), change_submits=True, key='-list-')]])
+    col2 = sg.Frame('Компании', [[sg.Listbox(companies_list, size=(150, 35), change_submits=True, key='-list-', select_mode='multiple')]])
     button_download = sg.Button('Обновить данные')
     button_download_chosen = sg.Button('Скачать выбранное')
     buttons = sg.Column([[sg.Button('Скачать отчетности')],
                           [sg.Button('Обновить данные')],
                           [sg.Button('Скачать выбранное')]])
+    # layout = [[col2, buttons]]
     layout = [[col2, buttons]]
-
     window = sg.Window('', layout)
+
+    # Получение списка ключей, чтобы потом найти их значения и по ссылкам скачать файлы
+    selected_list = window.read()
 
     while True:
         event, values = window.read()
@@ -46,6 +52,11 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
             AnalizData.make_file(url_dict)
         if event == 'Скачать отчетности':
             AnalizData.saving(url_dict)
+        if event == 'Скачать выбранное':
+            # Попытка вывести элементы листа
+            for elem in selected_list:
+                pprint.pprint(elem)
+
 
 else:
     text = sg.Text('Перед началом работы необходимо скачать данные. Для этого нажмите на кнопку.')
