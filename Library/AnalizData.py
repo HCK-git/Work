@@ -6,14 +6,16 @@ import json
 import zipfile
 import tempfile
 import pprint
+import urllib.request
 import time
 
 
 keys = []
+dir_list = []
 
 
 def forming_dict():
-    df = pd.read_csv(os.path.abspath('../Data/Data'), encoding='1251')
+    df = pd.read_csv(os.path.abspath('../Data/Data.csv'), encoding='1251')
     pd.set_option('display.max_columns', None)
     df = df[['EMITENT_FULL_NAME', 'DISCLOSURE_RF_INFO_PAGE']].drop_duplicates()
     # print(df)
@@ -187,17 +189,35 @@ def read_file():
     return list_info
 
 
-# if os.path.exists("List.json"):
-#         urls_cleaned = read_file()
-#         pprint.pprint(urls_cleaned)
-# else:
-# url_dict = forming_dict()
-# pprint.pprint(url_dict)
-# urls_cleaned = url_callback(url_dict)
-# pprint.pprint(urls_cleaned)
-# make_file(urls_cleaned)
-# # # search(urls_cleaned)
-# print(len(urls_cleaned.keys()))
-# saving(urls_cleaned)
+def make_dir_file():
+    dir_list = os.listdir(os.path.abspath('../Output'))
+    open(os.path.abspath('../Output/Folders.txt'), "w").close()
+    with open(os.path.abspath('../Output/Folders.txt'), "w") as f:
+        for elem in dir_list:
+            if elem != 'Folders.txt':
+                f.write(elem + '\n')
 
-# print(url_dict['Общество с ограниченной ответственностью "ДиректЛизинг"'])
+
+def download_listing():
+    url = "https://www.moex.com/ru/listing/securities-list.aspx"
+    link = ""
+
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+    quotes = soup.findAll("a")
+    for elem in quotes:
+        string_united = ''
+        string = str(elem)
+        for i in string:
+            string_united = string_united + i
+        if ">CSV (разделители - запятые)" in string_united:
+            first = string_united.find('="') + 2
+            last = string_united.find(">CSV (разделители - запятые)") - 1
+            link = string_united[first:last]
+            # link = link[1:len(link)-1]
+            link = "https://www.moex.com/ru/listing/" + link
+            print(link)
+
+    destination = os.path.abspath('../Data/Data.csv')
+    urllib.request.urlretrieve(link, destination)
+
