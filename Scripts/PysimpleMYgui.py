@@ -1,9 +1,13 @@
+# дописать автоматическую установку всех библиотек
+
+
 import PySimpleGUI as sg
 import os
 import sys
+import pprint
 sys.path.append(os.path.abspath('../Library'))
 import AnalizData
-import pprint
+
 
 url_dict = {}
 path = os.getcwd()
@@ -18,12 +22,14 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
 
     companies_list = list(url_dict.keys())
 
-    col2 = sg.Frame('Компании', [[sg.Listbox(values=companies_list, size=(150, 35), change_submits=True, key='companies', select_mode='multiple')]])
+    col2 = sg.Frame('Компании', [[sg.Listbox(values=companies_list, size=(150, 35), change_submits=True,
+                                             key='companies', select_mode='multiple')]])
     # button_download = sg.Button('Обновить данные')
     # button_download_chosen = sg.Button('Скачать выбранное')
-    buttons = sg.Column([[sg.Frame('Работа со всеми данными', [[sg.Button('Скачать все отчетности'), sg.Button('Обновить список компаний')]])],
-                          [sg.Text(' '*10)],
-                          [sg.Frame('Выборка данных', [[sg.Button('Сохранить выбор'), sg.Button('Скачать выбранное')]])]])
+    buttons = sg.Column([[sg.Frame('Работа со всеми данными',
+                         [[sg.Button('Скачать все отчетности'), sg.Button('Обновить список компаний')]])],
+                         [sg.Text(' '*10)], [sg.Frame('Выборка данных', [[sg.Button('Сохранить выбор'),
+                                                                         sg.Button('Скачать выбранное')]])]])
     # layout = [[col2, buttons]]
     # sg.theme('DarkTeal10')
     layout = [[col2, buttons]]
