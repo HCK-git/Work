@@ -1,44 +1,33 @@
 import PySimpleGUI as sg
-import json
-# import os
-# from ..Library import AnalizData
 import os
 import sys
 sys.path.append(os.path.abspath('../Library'))
 import AnalizData
-
-
 import pprint
+
 url_dict = {}
 path = os.getcwd()
-
+selected_list = []
+selected_dict = {}
 
 if os.path.exists(os.path.abspath('../Data/List.json')):
-    # with open(os.path.abspath('../Data/List.json'), "r") as f:
-    #     companies_dict = json.load(f)
+
     url_dict = AnalizData.read_file()
 
-    companies_list = url_dict.keys()
+    companies_list = list(url_dict.keys())
 
-    # print(companies_list)
-
-
-    # col2 = sg.Column([[sg.Frame('Компании:', [[sg.Column([[sg.Listbox([str(i) for i in  companies_list],
-    #                                                                   key='-ACCT-LIST-', size=(250, 437)), ]],
-    #                                                      scrollable=True, size=(500, 600))]])]], pad=(0, 0))
-
-    col2 = sg.Frame('Компании', [[sg.Listbox(companies_list, size=(150, 35), change_submits=True, key='-list-', select_mode='multiple')]])
+    col2 = sg.Frame('Компании', [[sg.Listbox(values=companies_list, size=(150, 35), change_submits=True, key='companies', select_mode='multiple')]])
     button_download = sg.Button('Обновить данные')
     button_download_chosen = sg.Button('Скачать выбранное')
-    buttons = sg.Column([[sg.Button('Скачать отчетности')],
-                          [sg.Button('Обновить данные')],
-                          [sg.Button('Скачать выбранное')]])
+    buttons = sg.Column([[sg.Frame('Работа со всеми данными', [[sg.Button('Скачать все отчетности'), sg.Button('Обновить данные')]])],
+                          [sg.Text(' '*10)],
+                          [sg.Frame('Выборка данных', [[sg.Button('Скачать выбранное'), sg.Button('Сохранить выбор')]])]])
     # layout = [[col2, buttons]]
+    sg.theme('DarkTeal10')
     layout = [[col2, buttons]]
     window = sg.Window('', layout)
 
     # Получение списка ключей, чтобы потом найти их значения и по ссылкам скачать файлы
-    selected_list = window.read()
 
     while True:
         event, values = window.read()
@@ -50,12 +39,18 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
             url_dict = AnalizData.forming_dict()
             AnalizData.url_callback(url_dict)
             AnalizData.make_file(url_dict)
-        if event == 'Скачать отчетности':
+        if event == 'Скачать все отчетности':
             AnalizData.saving(url_dict)
+        if event == 'Сохранить выбор':
+            for elem in values['companies']:
+                selected_list.append(elem)
         if event == 'Скачать выбранное':
-            # Попытка вывести элементы листа
+            pprint.pprint(f'selected_list: {selected_list}')
             for elem in selected_list:
-                pprint.pprint(elem)
+                print(type(selected_list))
+                print(type(elem))
+                selected_dict[elem] = url_dict[elem]
+            AnalizData.saving(selected_dict)
 
 
 else:
