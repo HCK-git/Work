@@ -1,6 +1,5 @@
 # дописать автоматическую установку всех библиотек
 
-
 import PySimpleGUI as sg
 import os
 import sys
