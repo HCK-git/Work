@@ -4,7 +4,6 @@
 import PySimpleGUI as sg
 import os
 import sys
-import pprint
 sys.path.append(os.path.abspath('../Library'))
 import AnalizData
 
@@ -24,22 +23,15 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
 
     col2 = sg.Frame('Компании', [[sg.Listbox(values=companies_list, size=(150, 35), change_submits=True,
                                              key='companies', select_mode='multiple')]])
-    # button_download = sg.Button('Обновить данные')
-    # button_download_chosen = sg.Button('Скачать выбранное')
     buttons = sg.Column([[sg.Frame('Работа со всеми данными',
                          [[sg.Button('Скачать все отчетности'), sg.Button('Обновить список компаний')]])],
                          [sg.Text(' '*10)], [sg.Frame('Выборка данных', [[sg.Button('Сохранить выбор'),
                                                                          sg.Button('Скачать выбранное')]])]])
-    # layout = [[col2, buttons]]
-    # sg.theme('DarkTeal10')
     layout = [[col2, buttons]]
     window = sg.Window('', layout)
 
-    # Получение списка ключей, чтобы потом найти их значения и по ссылкам скачать файлы
-
     while True:
         event, values = window.read()
-        print(event, values)
         if event == sg.WIN_CLOSED:
             break
         if event == 'Обновить список компаний':
@@ -57,10 +49,7 @@ if os.path.exists(os.path.abspath('../Data/List.json')):
                 selected_list.append(elem)
         if event == 'Скачать выбранное':
             selected_dict = {}
-            pprint.pprint(f'selected_list: {selected_list}')
             for elem in selected_list:
-                print(type(selected_list))
-                print(type(elem))
                 selected_dict[elem] = url_dict[elem]
             AnalizData.saving(selected_dict)
             AnalizData.make_dir_file()

@@ -15,10 +15,11 @@ dir_list = []
 
 
 def forming_dict():
+    """Функция чтение CSV файла, формирование словаря, в котором хранится список всех компаний
+     и ссылки на сайт с их отчетностями. Функция возвращает сформированный словарь. Владимир Никитин."""
     df = pd.read_csv(os.path.abspath('../Data/Data.csv'), encoding='1251')
     pd.set_option('display.max_columns', None)
     df = df[['EMITENT_FULL_NAME', 'DISCLOSURE_RF_INFO_PAGE']].drop_duplicates()
-    # print(df)
 
     df['DISCLOSURE_RF_INFO_PAGE'].fillna(0, inplace=True)
     inform_dict = df.groupby(['EMITENT_FULL_NAME'])['DISCLOSURE_RF_INFO_PAGE'].apply(list).to_dict()
@@ -33,6 +34,9 @@ def forming_dict():
 
 
 def saving(url):
+    """Функция скачивания архивов и их разархивации. На вход функции подается словрь с компаниями
+    и ссылками на страницу сайта с их отчетностями, в процессе скачивания появляетс окно с полоской прогресса.
+     Владимир Никитин и Матанов Кирилл."""
     k = 0
     progress = 0
     progressbar = [[sg.ProgressBar(len(url), orientation='h', size=(51, 10), key='progressbar')]]
@@ -47,69 +51,27 @@ def saving(url):
         name = name.lstrip()
         name = name.rstrip()
         if os.path.exists(os.path.abspath('../Output') + '/' + name):
-            print("in if")
             pass
-        # print(os.path.exists(os.path.abspath('../Output') + '/'  + name))
         else:
-            print('in else')
             os.mkdir(os.path.abspath('../Output') + '/' + name)
-        print(f"name: {name}")
-        print(os.path.abspath('../Output') + '/' + name)
         k = k + 1
-        print('k = {}'.format(k))
         link = url[elem]
         response = requests.get(link)
-        # if "disclosure.skrin" in url[elem]:
-        #     print(1)
-        #     response.encoding = "windows 1251"
         soup = BeautifulSoup(response.text, 'lxml')
-        print(0)
-        # if "disclosure.skrin" in url[elem]:
-        #     # xpath = '//*[@id="td1"]'
-        #     quotes = soup.findAll("a")
-        #     for elements in quotes:
-        #         string_united = ''
-        #         string = str(elements)
-        #         for i in string:
-        #             string_united = string_united + i
-        #         if 'href="/disclosure_docs' in string_united:
-        #             start = string_united.find('/Год')
-        #             end = string_united.find('" target')
-        #             print(string_united[start:end])
-        #             start_url = string_united.find('="/')
-        #             destination = string_united[start+1:end]
-        #             url_to_download = 'https://disclosure.skrin.ru/' + string_united[start_url+3:end]
-        #             if " " in url_to_download:
-        #                 url_to_download = url_to_download.replace(' ', '_')
-        #             print(url_to_download)
-        #             print(elem)
-        #             with open(os.path.abspath('../Output') + '/'  + name + '/' + destination, 'wb') as f:
-        #                 destination = os.path.abspath('../Output') + '/'  + elem + '/' + destination
-        #                 print('скачиваю')
-        #                 ufr = requests.get(url_to_download)
-        #                 print(f'urf: {ufr.content.decode("windows 1251")}')# делаем запрос
-        #                 f.write(ufr.content)  # записываем содержимое в файл; как видите - content запроса
-        #             # wget.download(url, destination)
         if "e-disclosure" in url[elem]:
-            print(2)
             quotes = soup.findAll("a", {"class": "file-link"})
-            # print(quotes)
             for elements in quotes:
                 string_united = ''
-                # print('4')
                 string = str(elements)
-                # print('5')
                 for i in string:
                     string_united = string_united + i
                 beg_url = string_united.find('href="http')+6
                 end_url = string_united.find('">')
                 response = requests.get(string_united[beg_url:end_url])
-                print(string_united[beg_url:end_url])
                 file = tempfile.TemporaryFile()
                 file.write(response.content)
                 try:
                     fzip = zipfile.ZipFile(file)
-                    print(f'file: {fzip}')
                     while '"' in elem:
                         elem = elem.replace('"', ' ')
                     fzip.extractall(os.path.abspath('../Output') + "/" + name)
@@ -123,6 +85,9 @@ def saving(url):
 
 
 def url_callback(urls):
+    """Функция формирования словаря, содержащего только компании, имеющие страницу с отчетностью
+     и ссылки на эти страницы. На вход подается словарь всех компаний и ссылок на главную страницу их сайта
+     Владимир Никитин и Матанов Кирилл."""
     progressbar = [[sg.ProgressBar(len(urls), orientation='h', size=(51, 10), key='progressbar')]]
     layout = [[sg.Frame('Прогресс', layout=progressbar)], [sg.Button('Старт')]]
     window = sg.Window('Обновление списка компаний', layout)
@@ -136,23 +101,16 @@ def url_callback(urls):
             progress = progress + 1
             progress_bar.UpdateBar(progress)
             if ';' in urls[elem]:
-                print('in ;')
                 list_of_urls = urls[elem].split(';')
                 for i in list_of_urls:
                     if 'www.e-disclosure.ru/' in i:
-                        print(f'i: {i}')
                         urls[elem] = i
-            # time.sleep(0.2)
             k = k + 1
-            print(f"elem: {urls[elem]}")
-            print("k={}".format(k))
             if " " in urls[elem]:
                 urls[elem] = urls[elem].replace(" ", '')
             if "https:" not in urls[elem] and "http:" not in urls[elem]:
                 urls[elem] = "https://" + urls[elem]
-                # print('2')
             url = urls[elem]
-            print(url)
             response = requests.get(url)
             soup = BeautifulSoup(response.text, 'lxml')
             quotes = soup.find_all('a')
@@ -167,7 +125,6 @@ def url_callback(urls):
                     first_amp = string_united.find('amp')
                     second_amp = string_united.find(';type')
                     string_united = string_united.replace(string_united[first_amp:second_amp+1], '')
-                    print("Добавил https://e-disclosure.ru/"+string_united[first+1:second-4])
                     otch_dict[elem] = "https://e-disclosure.ru/"+string_united[first+1:second-4]
     window.close()
     return otch_dict
@@ -197,18 +154,22 @@ def search(urls):
 
 
 def make_file(data):
+    """Функция создания json файла, содержащего словарь с компаниями и ссылками на страницу их сайта с отчетностью.
+     На вход подается слвоарь, содержащий все эти данные. Владимир Никитин"""
     with open(os.path.abspath('../Data/List.json'), "w") as f:
-        # for elem in urls_cleaned.keys():
         json.dump(data, f)
 
 
 def read_file():
+    """""Функция чтения json файла, содержащего словарь с компаниями и ссылками на страницу их сайта с отчетностью.
+    Матанов Кирилл"""
     with open(os.path.abspath('../Data/List.json'), "r") as f:
         list_info = json.load(f)
     return list_info
 
 
 def make_dir_file():
+    """Функция создания файла Folders.txt, содержащий список папок Владимир Никитин"""
     dir_list = os.listdir(os.path.abspath('../Output'))
     open(os.path.abspath('../Output/Folders.txt'), "w").close()
     with open(os.path.abspath('../Output/Folders.txt'), "w") as f:
@@ -218,9 +179,9 @@ def make_dir_file():
 
 
 def download_listing():
+    """Матанов Кирилл"""
     url = "https://www.moex.com/ru/listing/securities-list.aspx"
     link = ""
-
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
     quotes = soup.findAll("a")
@@ -233,9 +194,6 @@ def download_listing():
             first = string_united.find('="') + 2
             last = string_united.find(">CSV (разделители - запятые)") - 1
             link = string_united[first:last]
-            # link = link[1:len(link)-1]
             link = "https://www.moex.com/ru/listing/" + link
-            print(link)
-
     destination = os.path.abspath('../Data/Data.csv')
     urllib.request.urlretrieve(link, destination)
