@@ -5,7 +5,6 @@ import os
 import json
 import zipfile
 import tempfile
-# import pprint
 import urllib.request
 import PySimpleGUI as sg
 
@@ -46,7 +45,6 @@ def saving(url):
     event, values = window.read()
     if event == 'Старт':
         for elem in url.keys():
-            print(url[elem])
             name = elem
             while '"' in name:
                 name = elem.replace('"', '')
@@ -100,7 +98,6 @@ def site_parsing(urls):
     progress = 0
     if event == 'Старт':
         for elem in urls.keys():
-            print(f"urls[elem] = {urls[elem]}")
             progress = progress + 1
             progress_bar.UpdateBar(progress)
             if ';' in urls[elem]:
@@ -114,7 +111,6 @@ def site_parsing(urls):
             if "https:" not in urls[elem] and "http:" not in urls[elem]:
                 urls[elem] = "https://" + urls[elem]
             url = urls[elem]
-            print(f"url = {url}")
             response = requests.get(url)
             soup = BeautifulSoup(response.text, 'lxml')
             quotes = soup.find_all('a')
@@ -130,33 +126,8 @@ def site_parsing(urls):
                     second_amp = string_united.find(';type')
                     string_united = string_united.replace(string_united[first_amp:second_amp+1], '')
                     otch_dict[elem] = "https://e-disclosure.ru/"+string_united[first+1:second-4]
-                    print(f"otch_dict[elem] = {otch_dict[elem]}")
-            print('\n')
     window.close()
     return otch_dict
-
-
-def search(urls):
-    for elem in urls.keys():
-        link = urls[elem]
-        # print("Введите год, с которого начинается загрузка")
-        # date_from = input()
-        # print("Введите год, на котором закончится загрузка")
-        # date_to = input()
-        # print("Введите название компании, отчетность которой будет загружена")
-        # company = input()
-        response = requests.get(link)
-        soup = BeautifulSoup(response.text, 'lxml')
-        quotes = soup.find_all('td')
-        string_united = ''
-        string = str(quotes)
-        # print('5')
-        for i in string:
-            string_united = string_united + i
-        # print(string_united)
-        j = string_united.find('<td>20')
-        print('j = {}'.format(j))
-        # pprint.pprint(string_united[j:len(string_united)])
 
 
 def make_file(data):
